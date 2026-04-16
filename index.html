@@ -6,60 +6,69 @@
 <title>6F ミニバー賞味期限チェック</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;font-size:14px;color:#1a1a1a}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;font-size:14px;color:#1a1a1a}
 .app{max-width:960px;margin:0 auto;padding:10px}
-.header{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.header h1{font-size:15px;font-weight:600;color:#1a1a1a}
-.legend{display:flex;gap:12px;font-size:11px;color:#666;flex-wrap:wrap;margin-top:4px}
+.header{background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 4px 12px rgba(29,158,117,0.25)}
+.header h1{font-size:15px;font-weight:700;color:#fff;letter-spacing:0.2px}
+.legend{display:flex;gap:10px;font-size:11px;color:rgba(255,255,255,0.8);flex-wrap:wrap;margin-top:5px}
 .leg{display:flex;align-items:center;gap:4px}
-.leg-dot{width:8px;height:8px;border-radius:50%}
-.header-btns{display:flex;gap:6px;flex-wrap:wrap}
-.btn{font-size:13px;padding:7px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;font-family:inherit}
-.btn:hover{background:#f0f0f0}
-.btn.primary{background:#1D9E75;color:#fff;border-color:#1D9E75}
-.btn.primary:hover{background:#0F6E56}
-.btn.danger{background:#E24B4A;color:#fff;border-color:#E24B4A}
+.leg-dot{width:7px;height:7px;border-radius:50%}
+.header-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{font-size:13px;padding:8px 16px;border:none;border-radius:10px;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-family:inherit;font-weight:600;backdrop-filter:blur(4px);transition:background 0.15s}
+.btn:hover{background:rgba(255,255,255,0.25)}
+.btn.primary{background:#fff;color:#0F6E56;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+.btn.primary:hover{background:#f0fdf8}
+.btn.danger{background:#E24B4A;color:#fff;border:none}
 .btn.danger:hover{background:#A32D2D}
-.status-bar{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:8px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
-.stat{font-size:12px;color:#666}
-.stat b{color:#1a1a1a;font-weight:600}
-.sync-status{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.status-bar{background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.stat{font-size:12px;color:#888}
+.stat b{color:#1a1a1a;font-weight:700}
+.sync-status{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
 .sync-ok{background:#E1F5EE;color:#0F6E56}
 .sync-err{background:#FCEBEB;color:#A32D2D}
-.sync-loading{background:#f0f0f0;color:#666}
-.table-wrap{background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 130px)}
+.sync-loading{background:#f0f0f0;color:#888}
+.table-wrap{background:#fff;border-radius:14px;overflow:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 140px);box-shadow:0 1px 4px rgba(0,0,0,0.06)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#f8f8f6;font-weight:600;color:#666;font-size:11px;padding:8px 6px;text-align:center;border-bottom:1px solid #e0e0e0;white-space:nowrap;position:sticky;top:0;z-index:2}
-th:first-child{text-align:left;padding-left:12px;position:sticky;left:0;z-index:3;background:#f8f8f6}
-td{padding:5px 4px;text-align:center;border-bottom:1px solid #f0f0f0}
-td:first-child{font-weight:600;font-size:12px;color:#666;text-align:left;padding-left:12px;position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid #e0e0e0}
+th{background:#f4f6f8;font-weight:700;color:#888;font-size:11px;padding:9px 6px;text-align:center;border-bottom:1px solid #e8eaec;white-space:nowrap;position:sticky;top:0;z-index:2;letter-spacing:0.2px}
+th:first-child{text-align:left;padding-left:12px;position:sticky;left:0;z-index:3;background:#f4f6f8}
+td{padding:5px 4px;text-align:center;border-bottom:1px solid #f2f3f5}
+td:first-child{font-weight:700;font-size:12px;color:#555;text-align:left;padding-left:12px;position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid #eee}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafaf8}
-tr:hover td:first-child{background:#fafaf8}
-.cell-input{width:62px;font-size:13px;padding:4px;border:1px solid transparent;border-radius:5px;background:transparent;color:#1a1a1a;text-align:center;font-family:inherit}
-.cell-input:hover{border-color:#ccc}
-.cell-input:focus{outline:none;border-color:#1D9E75;background:#fff;box-shadow:0 0 0 2px rgba(29,158,117,0.15)}
-.cell-input.has-value{color:#0F6E56;font-weight:600}
-.cell-input.expired{color:#E24B4A;font-weight:600;background:#fff5f5}
-.cell-input.expiring{color:#BA7517;font-weight:600;background:#fffbf0}
-.err-box{background:#FCEBEB;border:1px solid #f0b0b0;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#A32D2D;display:none}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center}
+tr:hover td{background:#f8fffe}
+tr:hover td:first-child{background:#f8fffe}
+.cell-input{width:62px;font-size:13px;padding:5px 3px;border:1px solid transparent;border-radius:6px;background:transparent;color:#1a1a1a;text-align:center;font-family:inherit;transition:all 0.15s}
+.cell-input:hover{border-color:#d0d0d0;background:#fafafa}
+.cell-input:focus{outline:none;border-color:#1D9E75;background:#fff;box-shadow:0 0 0 3px rgba(29,158,117,0.12)}
+.cell-input.has-value{color:#0F6E56;font-weight:700}
+.cell-input.expired{color:#E24B4A;font-weight:700;background:#fff5f5}
+.cell-input.expiring{color:#BA7517;font-weight:700;background:#fffbf0}
+.err-box{background:#FCEBEB;border:1px solid #f0b0b0;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#A32D2D;display:none}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:14px;padding:20px;width:340px;max-width:92vw;max-height:85vh;overflow-y:auto}
-.modal h2{font-size:16px;font-weight:600;margin-bottom:14px;color:#1a1a1a}
-.modal-input{width:100%;font-size:30px;font-weight:600;text-align:center;padding:10px;border:1px solid #ccc;border-radius:8px;background:#f8f8f6;color:#1a1a1a;margin-bottom:8px;letter-spacing:5px;font-family:inherit}
-.modal-input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,0.15)}
-.modal-hint{font-size:12px;color:#888;margin-bottom:14px;text-align:center}
-.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
-.item-btn{flex:1 1 calc(50% - 4px);font-size:12px;padding:10px 6px;border:1px solid #ccc;border-radius:8px;background:#f8f8f6;color:#1a1a1a;cursor:pointer;text-align:center;font-family:inherit;line-height:1.4}
-.item-btn:hover{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
-.item-btn .cur-val{font-size:10px;color:#888;display:block;margin-top:2px}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,0.15);animation:slideUp 0.25s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 18px}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:14px;color:#1a1a1a;text-align:center}
+.modal-input{width:100%;font-size:34px;font-weight:700;text-align:center;padding:12px;border:2px solid #e8e8e8;border-radius:12px;background:#f8f9fa;color:#1a1a1a;margin-bottom:8px;letter-spacing:6px;font-family:inherit}
+.modal-input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,0.12)}
+.modal-hint{font-size:12px;color:#aaa;margin-bottom:16px;text-align:center}
+.modal-btns{display:flex;gap:10px;flex-wrap:wrap}
+.item-btn{flex:1 1 calc(50% - 5px);font-size:13px;padding:14px 8px;border:1.5px solid #e8e8e8;border-radius:12px;background:#f8f9fa;color:#1a1a1a;cursor:pointer;text-align:center;font-family:inherit;line-height:1.4;font-weight:600;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.item-btn:active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;transform:scale(0.97)}
+.item-btn .cur-val{font-size:11px;color:#aaa;display:block;margin-top:3px;font-weight:400}
+.fab{display:none;position:fixed;bottom:24px;right:20px;z-index:50;background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:15px;font-weight:700;font-family:inherit;box-shadow:0 4px 16px rgba(29,158,117,0.4);cursor:pointer;-webkit-tap-highlight-color:transparent}
 @media(max-width:600px){
-  .app{padding:6px}
+  .app{padding:6px 6px 80px}
+  .header{border-radius:12px;padding:12px 14px}
   .header h1{font-size:13px}
-  th,td{padding:5px 3px;font-size:11px}
-  .cell-input{width:52px;font-size:11px}
-  th:first-child,td:first-child{padding-left:8px;font-size:11px}
+  .header-btns .btn.primary{display:none}
+  .fab{display:block}
+  th,td{padding:6px 3px;font-size:11px}
+  .cell-input{width:50px;font-size:11px;padding:5px 2px}
+  th:first-child,td:first-child{padding-left:8px;font-size:11px;min-width:44px}
+  .status-bar{border-radius:10px;gap:8px}
+  .stat{font-size:11px}
+  .table-wrap{max-height:calc(100vh - 160px);border-radius:12px}
 }
 </style>
 </head>
@@ -71,7 +80,7 @@ tr:hover td:first-child{background:#fafaf8}
       <div class="legend">
         <div class="leg"><div class="leg-dot" style="background:#0F6E56"></div>入力済み</div>
         <div class="leg"><div class="leg-dot" style="background:#E24B4A"></div>期限切れ</div>
-        <div class="leg"><div class="leg-dot" style="background:#BA7517"></div>3ヶ月以内</div>
+        <div class="leg"><div class="leg-dot" style="background:#BA7517"></div>翌月期限</div>
       </div>
     </div>
     <div class="header-btns">
@@ -85,9 +94,11 @@ tr:hover td:first-child{background:#fafaf8}
   <div class="status-bar">
     <span class="stat">入力済み: <b id="filledCount">0</b> セル</span>
     <span class="stat">期限切れ: <b id="expiredCount" style="color:#E24B4A">0</b> 件</span>
-    <span class="stat">3ヶ月以内: <b id="expiringCount" style="color:#BA7517">0</b> 件</span>
+    <span class="stat">翌月期限: <b id="expiringCount" style="color:#BA7517">0</b> 件</span>
     <span class="stat" id="cursorPos" style="color:#1D9E75;font-weight:500"></span>
   </div>
+
+  <button class="fab" onclick="openJump()">客室検索</button>
 
   <div class="table-wrap">
     <table>
@@ -112,6 +123,7 @@ tr:hover td:first-child{background:#fafaf8}
 
 <div class="modal-bg" id="jumpModal">
   <div class="modal">
+    <div class="modal-handle"></div>
     <h2 id="jumpTitle">客室検索 — 部屋番号を入力</h2>
     <input class="modal-input" id="jumpInput" type="number" placeholder="601">
     <div class="modal-hint" id="jumpHint">3桁の部屋番号を入力して Enter</div>
@@ -199,10 +211,10 @@ function getStatus(val) {
   const d = (2000 + parseInt(m[1])) * 100 + parseInt(m[2]);
   const now = new Date();
   const nowNum = now.getFullYear() * 100 + (now.getMonth() + 1);
-  const in3 = new Date(now.getFullYear(), now.getMonth() + 3, 1);
-  const in3Num = in3.getFullYear() * 100 + (in3.getMonth() + 1);
-  if (d < nowNum) return 'expired';
-  if (d <= in3Num) return 'expiring';
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const nextMonthNum = nextMonth.getFullYear() * 100 + (nextMonth.getMonth() + 1);
+  if (d <= nowNum) return 'expired';
+  if (d === nextMonthNum) return 'expiring';
   return 'ok';
 }
 
@@ -258,6 +270,25 @@ function buildTable() {
     });
     tbody.appendChild(tr);
   });
+
+  // 期限切れ合計行
+  const sumTr = document.createElement('tr');
+  sumTr.style.cssText = 'background:#fff5f5;font-weight:600;border-top:2px solid #E24B4A';
+  const sumTd0 = document.createElement('td');
+  sumTd0.textContent = '期限切れ合計';
+  sumTd0.style.cssText = 'color:#E24B4A;font-weight:700;white-space:nowrap';
+  sumTr.appendChild(sumTd0);
+  for (let ci = 0; ci < 9; ci++) {
+    let count = 0;
+    ROOMS.forEach(r => { if (getStatus((data[r] || [])[ci]) === 'expired') count++; });
+    const td = document.createElement('td');
+    td.textContent = count;
+    td.style.color = '#E24B4A';
+    td.style.fontWeight = '700';
+    sumTr.appendChild(td);
+  }
+  tbody.appendChild(sumTr);
+
   updateStats();
 }
 
