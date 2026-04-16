@@ -85,6 +85,7 @@ tr:hover td:first-child{background:#f8fffe}
     </div>
     <div class="header-btns">
       <span class="sync-status sync-loading" id="syncStatus">接続中...</span>
+      <button class="btn" onclick="clearExpired()" style="background:rgba(226,75,74,0.15);color:#fff;border:none">期限切れ消去</button>
       <button class="btn primary" onclick="openJump()">客室検索</button>
     </div>
   </div>
@@ -92,7 +93,7 @@ tr:hover td:first-child{background:#f8fffe}
   <div class="err-box" id="errBox"></div>
 
   <div class="status-bar">
-    <span class="stat">入力済み: <b id="filledCount">0</b> セル</span>
+    <span class="stat">未入力: <b id="filledCount">0</b> セル</span>
     <span class="stat">期限切れ: <b id="expiredCount" style="color:#E24B4A">0</b> 件</span>
     <span class="stat">翌月期限: <b id="expiringCount" style="color:#BA7517">0</b> 件</span>
     <span class="stat" id="cursorPos" style="color:#1D9E75;font-weight:500"></span>
@@ -316,17 +317,40 @@ function focusCell(ri, ci) {
 }
 
 function updateStats() {
-  let filled = 0, expired = 0, expiring = 0;
+  let unfilled = 0, expired = 0, expiring = 0;
+  const totalCells = ROOMS.length * 9;
+  let filled = 0;
   ROOMS.forEach(r => {
     (data[r] || []).forEach(v => {
       if (v) { filled++; const st = getStatus(v); if (st==='expired') expired++; else if (st==='expiring') expiring++; }
     });
   });
-  document.getElementById('filledCount').textContent = filled;
+  unfilled = totalCells - filled;
+  document.getElementById('filledCount').textContent = unfilled;
   document.getElementById('expiredCount').textContent = expired;
   document.getElementById('expiringCount').textContent = expiring;
 }
 
+
+function clearExpired() {
+  const targets = [];
+  ROOMS.forEach(r => {
+    (data[r] || []).forEach((v, ci) => {
+      if (getStatus(v) === 'expired') targets.push({r, ci});
+    });
+  });
+  if (targets.length === 0) { alert('期限切れのセルはありません。'); return; }
+  if (!confirm(targets.length + '件の期限切れデータを消去しますか？')) return;
+  setSyncStatus('loading');
+  const updates = {};
+  targets.forEach(({r, ci}) => {
+    data[r][ci] = '';
+    updates['rooms/' + r + '/cells/' + ci] = null;
+  });
+  db.ref().update(updates)
+    .then(() => { buildTable(); setSyncStatus('ok'); })
+    .catch(e => setSyncStatus('err', e.message));
+}
 
 function openJump() {
   jumpPhase = 'room';
