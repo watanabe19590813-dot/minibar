@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6F ミニバー賞味期限チェック</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;font-size:14px;color:#1a1a1a}
+.app{max-width:960px;margin:0 auto;padding:10px}
+.header{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header h1{font-size:15px;font-weight:600;color:#1a1a1a}
+.legend{display:flex;gap:12px;font-size:11px;color:#666;flex-wrap:wrap;margin-top:4px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.header-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-size:13px;padding:7px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;font-family:inherit}
+.btn:hover{background:#f0f0f0}
+.btn.primary{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.btn.primary:hover{background:#0F6E56}
+.btn.danger{background:#E24B4A;color:#fff;border-color:#E24B4A}
+.btn.danger:hover{background:#A32D2D}
+.status-bar{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:8px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.stat{font-size:12px;color:#666}
+.stat b{color:#1a1a1a;font-weight:600}
+.sync-status{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.sync-ok{background:#E1F5EE;color:#0F6E56}
+.sync-err{background:#FCEBEB;color:#A32D2D}
+.sync-loading{background:#f0f0f0;color:#666}
+.table-wrap{background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8f8f6;font-weight:600;color:#666;font-size:11px;padding:8px 6px;text-align:center;border-bottom:1px solid #e0e0e0;white-space:nowrap;position:sticky;top:0;z-index:2}
+th:first-child{text-align:left;padding-left:12px;position:sticky;left:0;z-index:3;background:#f8f8f6}
+td{padding:5px 4px;text-align:center;border-bottom:1px solid #f0f0f0}
+td:first-child{font-weight:600;font-size:12px;color:#666;text-align:left;padding-left:12px;position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid #e0e0e0}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+tr:hover td:first-child{background:#fafaf8}
+.cell-input{width:62px;font-size:13px;padding:4px 4px;border:1px solid transparent;border-radius:5px;background:transparent;color:#1a1a1a;text-align:center;font-family:inherit}
+.cell-input:hover{border-color:#ccc}
+.cell-input:focus{outline:none;border-color:#1D9E75;background:#fff;box-shadow:0 0 0 2px rgba(29,158,117,0.15)}
+.cell-input.has-value{color:#0F6E56;font-weight:600}
+.cell-input.expired{color:#E24B4A;font-weight:600;background:#fff5f5}
+.cell-input.expiring{color:#BA7517;font-weight:600;background:#fffbf0}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:20px;width:340px;max-width:92vw;max-height:85vh;overflow-y:auto}
+.modal h2{font-size:16px;font-weight:600;margin-bottom:14px;color:#1a1a1a}
+.modal-input{width:100%;font-size:30px;font-weight:600;text-align:center;padding:10px;border:1px solid #ccc;border-radius:8px;background:#f8f8f6;color:#1a1a1a;margin-bottom:8px;letter-spacing:5px;font-family:inherit}
+.modal-input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,0.15)}
+.modal-hint{font-size:12px;color:#888;margin-bottom:14px;text-align:center}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.item-btn{flex:1 1 calc(50% - 4px);font-size:12px;padding:10px 6px;border:1px solid #ccc;border-radius:8px;background:#f8f8f6;color:#1a1a1a;cursor:pointer;transition:all 0.1s;text-align:center;font-family:inherit;line-height:1.4}
+.item-btn:hover{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.item-btn .cur-val{font-size:10px;color:#888;display:block;margin-top:2px}
+.item-btn:hover .cur-val{color:#0F6E56}
+@media(max-width:600px){
+  .app{padding:6px}
+  .header h1{font-size:13px}
+  th,td{padding:5px 3px;font-size:11px}
+  .cell-input{width:52px;font-size:11px}
+  th:first-child,td:first-child{padding-left:8px;font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>【6F】ミニバー賞味期限チェック一覧表</h1>
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:#0F6E56"></div>入力済み</div>
+        <div class="leg"><div class="leg-dot" style="background:#E24B4A"></div>期限切れ</div>
+        <div class="leg"><div class="leg-dot" style="background:#BA7517"></div>3ヶ月以内</div>
+      </div>
+    </div>
+    <div class="header-btns">
+      <span class="sync-status sync-loading" id="syncStatus">接続中...</span>
+      <button class="btn primary" onclick="openJump()">消費入力</button>
+      <button class="btn danger" onclick="clearAll()">全消去</button>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span class="stat">入力済み: <b id="filledCount">0</b> セル</span>
+    <span class="stat">期限切れ: <b id="expiredCount" style="color:#E24B4A">0</b> 件</span>
+    <span class="stat">3ヶ月以内: <b id="expiringCount" style="color:#BA7517">0</b> 件</span>
+    <span class="stat" id="cursorPos" style="color:#1D9E75;font-weight:500"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th>部屋番号</th>
+          <th>水ボトル①</th>
+          <th>水ボトル②</th>
+          <th>オロナミンC</th>
+          <th>ポカリ</th>
+          <th>コーラ</th>
+          <th>お茶</th>
+          <th>柿の種</th>
+          <th>キリンB</th>
+          <th>アサヒB</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-bg" id="jumpModal">
+  <div class="modal">
+    <h2 id="jumpTitle">消費入力 — 部屋番号を入力</h2>
+    <input class="modal-input" id="jumpInput" type="number" placeholder="601">
+    <div class="modal-hint" id="jumpHint">3桁の部屋番号を入力して Enter</div>
+    <div class="modal-btns" id="jumpBtns">
+      <button class="btn" onclick="closeJump()" style="flex:1">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyALKR59lVRy5685kUPes38A-mG89B-BV7s",
+  authDomain: "minibar-stock.firebaseapp.com",
+  projectId: "minibar-stock",
+  storageBucket: "minibar-stock.firebasestorage.app",
+  messagingSenderId: "1062551441835",
+  appId: "1:1062551441835:web:d886ba8992380f266682ee",
+  databaseURL: "https://minibar-stock-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const COLS = ['水ボトル①','水ボトル②','オロナミンC','ポカリ','コーラ','お茶','柿の種','キリンB','アサヒB'];
+const ROOMS = [601,602,603,604,605,606,607,608,609,610,611,612,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640];
+
+let data = {};
+let curRow = 0, curCol = 0;
+let jumpPhase = 'room';
+let selectedRoom = null;
+let isBuilding = false;
+
+ROOMS.forEach(r => { data[r] = Array(9).fill(''); });
+
+function setSyncStatus(state) {
+  const el = document.getElementById('syncStatus');
+  if (state === 'ok') { el.textContent = '同期済み'; el.className = 'sync-status sync-ok'; }
+  else if (state === 'err') { el.textContent = '接続エラー'; el.className = 'sync-status sync-err'; }
+  else { el.textContent = '同期中...'; el.className = 'sync-status sync-loading'; }
+}
+
+const dbRef = ref(db, 'rooms');
+onValue(dbRef, (snapshot) => {
+  const val = snapshot.val();
+  ROOMS.forEach(r => {
+    if (val && val[r]) {
+      data[r] = val[r].cells ? [...val[r].cells] : Array(9).fill('');
+    } else {
+      data[r] = Array(9).fill('');
+    }
+  });
+  buildTable();
+  setSyncStatus('ok');
+}, (error) => {
+  setSyncStatus('err');
+});
+
+function saveCell(room, ci, value) {
+  setSyncStatus('loading');
+  set(ref(db, `rooms/${room}/cells/${ci}`), value)
+    .then(() => setSyncStatus('ok'))
+    .catch(() => setSyncStatus('err'));
+}
+
+function formatDate(s) {
+  s = s.trim();
+  if (!s) return '';
+  if (/^\d{3}$/.test(s)) return s.slice(0,2) + '/' + s.slice(2);
+  if (/^\d{4}$/.test(s)) return s.slice(0,2) + '/' + s.slice(2);
+  return s;
+}
+
+function getStatus(val) {
+  if (!val) return 'empty';
+  const m = val.match(/^(\d{2})\/(\d{2})$/);
+  if (!m) return 'ok';
+  const d = (2000 + parseInt(m[1])) * 100 + parseInt(m[2]);
+  const now = new Date();
+  const nowNum = now.getFullYear() * 100 + (now.getMonth() + 1);
+  const in3 = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+  const in3Num = in3.getFullYear() * 100 + (in3.getMonth() + 1);
+  if (d < nowNum) return 'expired';
+  if (d <= in3Num) return 'expiring';
+  return 'ok';
+}
+
+function buildTable() {
+  if (isBuilding) return;
+  isBuilding = true;
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  ROOMS.forEach((room, ri) => {
+    const tr = document.createElement('tr');
+    tr.id = 'row-' + room;
+    const td0 = document.createElement('td');
+    td0.textContent = room;
+    tr.appendChild(td0);
+    data[room].forEach((val, ci) => {
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'cell-input';
+      inp.value = val || '';
+      inp.dataset.room = room;
+      inp.dataset.col = ci;
+      inp.dataset.ri = ri;
+      applyClass(inp, val || '');
+      inp.addEventListener('focus', () => {
+        curRow = ri; curCol = ci;
+        updateCursorPos(room, ci);
+      });
+      inp.addEventListener('keydown', e => handleKey(e, room, ri, ci));
+      inp.addEventListener('blur', () => {
+        let v = formatDate(inp.value);
+        inp.value = v;
+        if (v !== (data[room][ci] || '')) {
+          data[room][ci] = v;
+          applyClass(inp, v);
+          saveCell(room, ci, v);
+          updateStats();
+        }
+      });
+      td.appendChild(inp);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  updateStats();
+  isBuilding = false;
+}
+
+function applyClass(inp, val) {
+  inp.className = 'cell-input';
+  if (val) {
+    const st = getStatus(val);
+    if (st === 'expired') inp.classList.add('expired');
+    else if (st === 'expiring') inp.classList.add('expiring');
+    else inp.classList.add('has-value');
+  }
+}
+
+function handleKey(e, room, ri, ci) {
+  if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
+    e.preventDefault();
+    let v = formatDate(e.target.value);
+    e.target.value = v;
+    if (v !== (data[room][ci] || '')) {
+      data[room][ci] = v;
+      applyClass(e.target, v);
+      saveCell(room, ci, v);
+      updateStats();
+    }
+    let nci = ci + 1, nri = ri;
+    if (nci >= 9) { nci = 0; nri = ri + 1; }
+    if (nri >= ROOMS.length) nri = 0;
+    focusCell(nri, nci);
+  }
+  if (e.key === 'Tab' && e.shiftKey) {
+    e.preventDefault();
+    let nci = ci - 1, nri = ri;
+    if (nci < 0) { nci = 8; nri = ri - 1; }
+    if (nri < 0) nri = ROOMS.length - 1;
+    focusCell(nri, nci);
+  }
+}
+
+function focusCell(ri, ci) {
+  const room = ROOMS[ri];
+  const tr = document.getElementById('row-' + room);
+  if (!tr) return;
+  const inputs = tr.querySelectorAll('.cell-input');
+  if (inputs[ci]) {
+    inputs[ci].focus();
+    inputs[ci].select();
+    updateCursorPos(room, ci);
+    inputs[ci].scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function focusCellByRoom(room, ci) {
+  focusCell(ROOMS.indexOf(room), ci);
+}
+
+function updateCursorPos(room, ci) {
+  document.getElementById('cursorPos').textContent = room + ' — ' + COLS[ci];
+}
+
+function updateStats() {
+  let filled = 0, expired = 0, expiring = 0;
+  ROOMS.forEach(r => {
+    (data[r] || []).forEach(v => {
+      if (v) {
+        filled++;
+        const st = getStatus(v);
+        if (st === 'expired') expired++;
+        else if (st === 'expiring') expiring++;
+      }
+    });
+  });
+  document.getElementById('filledCount').textContent = filled;
+  document.getElementById('expiredCount').textContent = expired;
+  document.getElementById('expiringCount').textContent = expiring;
+}
+
+window.clearAll = function() {
+  if (!confirm('全データを消去しますか？\nこの操作は全スタッフに反映されます。')) return;
+  setSyncStatus('loading');
+  remove(ref(db, 'rooms'))
+    .then(() => { ROOMS.forEach(r => { data[r] = Array(9).fill(''); }); buildTable(); setSyncStatus('ok'); })
+    .catch(() => setSyncStatus('err'));
+};
+
+window.openJump = function() {
+  jumpPhase = 'room';
+  selectedRoom = null;
+  document.getElementById('jumpTitle').textContent = '消費入力 — 部屋番号を入力';
+  document.getElementById('jumpInput').style.display = '';
+  document.getElementById('jumpHint').textContent = '3桁の部屋番号を入力して Enter';
+  document.getElementById('jumpHint').style.color = '#888';
+  document.getElementById('jumpInput').value = '';
+  document.getElementById('jumpBtns').innerHTML = '<button class="btn" onclick="closeJump()" style="flex:1">キャンセル</button>';
+  document.getElementById('jumpModal').classList.add('open');
+  setTimeout(() => document.getElementById('jumpInput').focus(), 80);
+};
+
+document.getElementById('jumpInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && jumpPhase === 'room') {
+    const v = parseInt(document.getElementById('jumpInput').value);
+    if (ROOMS.includes(v)) {
+      selectedRoom = v;
+      showItemSelect(v);
+    } else {
+      document.getElementById('jumpHint').textContent = '部屋番号が見つかりません。再度入力してください。';
+      document.getElementById('jumpHint').style.color = '#E24B4A';
+      document.getElementById('jumpInput').value = '';
+    }
+  }
+});
+
+function showItemSelect(room) {
+  jumpPhase = 'item';
+  document.getElementById('jumpTitle').textContent = room + ' — 項目を選択';
+  document.getElementById('jumpInput').style.display = 'none';
+  document.getElementById('jumpHint').textContent = 'ボタンをクリックして項目を選択';
+  document.getElementById('jumpHint').style.color = '#888';
+  const btns = document.getElementById('jumpBtns');
+  btns.innerHTML = '';
+  COLS.forEach((col, ci) => {
+    const b = document.createElement('button');
+    b.className = 'item-btn';
+    const curVal = data[room] ? (data[room][ci] || '') : '';
+    b.innerHTML = col + (curVal ? `<span class="cur-val">${curVal}</span>` : '');
+    b.onclick = () => { closeJump(); setTimeout(() => focusCellByRoom(room, ci), 100); };
+    btns.appendChild(b);
+  });
+  const cancel = document.createElement('button');
+  cancel.className = 'btn';
+  cancel.textContent = 'キャンセル';
+  cancel.style.cssText = 'flex:1 1 100%;margin-top:4px';
+  cancel.onclick = () => closeJump();
+  btns.appendChild(cancel);
+}
+
+window.closeJump = function() {
+  document.getElementById('jumpModal').classList.remove('open');
+};
+
+document.getElementById('jumpModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('jumpModal')) window.closeJump();
+});
+</script>
+</body>
+</html>
