@@ -180,8 +180,16 @@ function saveCell(room, ci, value) {
 function formatDate(s) {
   s = (s || '').trim();
   if (!s) return '';
-  if (/^\d{3}$/.test(s)) return s.slice(0,2) + '/' + s.slice(2);
-  if (/^\d{4}$/.test(s)) return s.slice(0,2) + '/' + s.slice(2);
+  if (/^\d{3}$/.test(s)) {
+    const yy = s.slice(0,2);
+    const mm = s.slice(2).padStart(2,'0');
+    return yy + '/' + mm;
+  }
+  if (/^\d{4}$/.test(s)) {
+    const yy = s.slice(0,2);
+    const mm = s.slice(2).padStart(2,'0');
+    return yy + '/' + mm;
+  }
   return s;
 }
 
