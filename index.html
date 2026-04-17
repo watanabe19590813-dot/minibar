@@ -187,7 +187,8 @@ function setSyncStatus(state, msg) {
 function subscribeFloor(floor) {
   if (listeners[floor]) return;
   const rooms = floor === '6F' ? ROOMS_6F : ROOMS_7F;
-  listeners[floor] = db.ref(floor + '/rooms').on('value', snapshot => {
+  const dbPath = floor === '6F' ? 'rooms' : floor + '/rooms';
+  listeners[floor] = db.ref(dbPath).on('value', snapshot => {
     const val = snapshot.val();
     rooms.forEach(r => {
       if (val && val[r] && val[r].cells) {
@@ -217,7 +218,8 @@ function switchFloor(floor) {
 
 function saveCell(room, ci, value) {
   setSyncStatus('loading');
-  db.ref(currentFloor + '/rooms/' + room + '/cells/' + ci).set(value || null)
+  const path = currentFloor === '6F' ? 'rooms' : currentFloor + '/rooms';
+  db.ref(path + '/' + room + '/cells/' + ci).set(value || null)
     .then(() => setSyncStatus('ok'))
     .catch(e => setSyncStatus('err', e.message));
 }
@@ -383,7 +385,8 @@ function clearExpired() {
   const updates = {};
   targets.forEach(({r, ci}) => {
     floorData[r][ci] = '';
-    updates[currentFloor + '/rooms/' + r + '/cells/' + ci] = null;
+    const cPath = currentFloor === '6F' ? 'rooms' : currentFloor + '/rooms';
+    updates[cPath + '/' + r + '/cells/' + ci] = null;
   });
   db.ref().update(updates)
     .then(() => { buildTable(); setSyncStatus('ok'); })
