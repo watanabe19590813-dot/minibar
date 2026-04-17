@@ -136,7 +136,7 @@ tr:hover td:first-child{background:#f8fffe}
     <div class="modal-handle"></div>
     <h2 id="jumpTitle">客室検索 — 客室番号を入力</h2>
     <input class="modal-input" id="jumpInput" type="number" placeholder="601">
-    <div class="modal-hint" id="jumpHint">3桁の部屋番号を入力して Enter</div>
+    <div class="modal-hint" id="jumpHint">3桁の客室番号を入力して Enter</div>
     <div class="modal-btns" id="jumpBtns">
       <button class="btn" onclick="closeJump()" style="flex:1">キャンセル</button>
     </div>
@@ -398,7 +398,7 @@ function openJump() {
   jumpPhase = 'room';
   document.getElementById('jumpTitle').textContent = '客室検索 — 客室番号を入力';
   document.getElementById('jumpInput').style.display = '';
-  document.getElementById('jumpHint').textContent = '3桁の部屋番号を入力して Enter';
+  document.getElementById('jumpHint').textContent = '3桁の客室番号を入力して Enter';
   document.getElementById('jumpHint').style.color = '#888';
   document.getElementById('jumpInput').value = '';
   document.getElementById('jumpBtns').innerHTML = '<button class="btn" onclick="closeJump()" style="flex:1;color:#555;background:#f0f0f0">キャンセル</button>';
