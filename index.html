@@ -134,7 +134,7 @@ tr:hover td:first-child{background:#f8fffe}
 <div class="modal-bg" id="jumpModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h2 id="jumpTitle">客室検索 — 部屋番号を入力</h2>
+    <h2 id="jumpTitle">客室検索 — 客室番号を入力</h2>
     <input class="modal-input" id="jumpInput" type="number" placeholder="601">
     <div class="modal-hint" id="jumpHint">3桁の部屋番号を入力して Enter</div>
     <div class="modal-btns" id="jumpBtns">
@@ -396,7 +396,7 @@ function clearExpired() {
 function openJump() {
   const ROOMS = getCurrentRooms();
   jumpPhase = 'room';
-  document.getElementById('jumpTitle').textContent = '客室検索 — 部屋番号を入力';
+  document.getElementById('jumpTitle').textContent = '客室検索 — 客室番号を入力';
   document.getElementById('jumpInput').style.display = '';
   document.getElementById('jumpHint').textContent = '3桁の部屋番号を入力して Enter';
   document.getElementById('jumpHint').style.color = '#888';
