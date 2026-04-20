@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ミニバー賞味期限チェック — 利用マニュアル</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a1a;font-size:15px}
+.page{max-width:480px;margin:0 auto;padding:16px}
+
+/* タイトル */
+.title-block{background:linear-gradient(135deg,#1D9E75,#0F6E56);border-radius:16px;padding:24px 20px;margin-bottom:20px;text-align:center;color:#fff}
+.title-block h1{font-size:20px;font-weight:700;margin-bottom:6px}
+.title-block p{font-size:13px;opacity:0.85}
+
+/* セクション */
+.section{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07)}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#1D9E75;color:#fff;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;flex-shrink:0}
+.section-title{display:flex;align-items:center;font-size:16px;font-weight:700;margin-bottom:14px;color:#1a1a1a}
+.desc{font-size:13px;color:#555;line-height:1.7;margin-bottom:12px}
+
+/* モックアップ共通 */
+.mockup{background:#f0f2f5;border-radius:14px;padding:10px;margin:12px 0;position:relative}
+.mock-header{background:linear-gradient(135deg,#1D9E75,#0F6E56);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.mock-header-title{color:#fff;font-size:12px;font-weight:700}
+.mock-header-legend{display:flex;gap:10px;margin-top:4px}
+.mock-leg{display:flex;align-items:center;gap:3px;font-size:10px;color:rgba(255,255,255,0.85)}
+.mock-dot{width:6px;height:6px;border-radius:50%}
+.mock-header-btns{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.mock-btn{font-size:10px;padding:4px 10px;border-radius:7px;font-weight:700;border:none}
+.mock-btn.red{background:rgba(226,75,74,0.2);color:#fff}
+.mock-btn.white{background:#fff;color:#0F6E56}
+.mock-tabs{display:flex;gap:5px;margin-bottom:6px}
+.mock-tab{flex:1;padding:6px;border-radius:8px;font-size:11px;font-weight:700;text-align:center;background:#fff;color:#aaa}
+.mock-tab.active{background:#1D9E75;color:#fff}
+.mock-stats{background:#fff;border-radius:8px;padding:7px 10px;margin-bottom:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.mock-stat{font-size:10px;color:#888}
+.mock-stat b{color:#1a1a1a}
+.mock-table{background:#fff;border-radius:8px;overflow:hidden}
+.mock-thead{background:#f4f6f8}
+.mock-tr{display:flex}
+.mock-th{font-size:9px;font-weight:700;color:#888;padding:5px 4px;text-align:center;flex:1;border-bottom:1px solid #e8eaec}
+.mock-th.first{flex:1.2;text-align:left;padding-left:8px}
+.mock-td{font-size:10px;padding:5px 4px;text-align:center;flex:1;border-bottom:1px solid #f2f3f5;border-right:1px solid #f0f0f0}
+.mock-td.first{flex:1.2;font-weight:700;text-align:left;padding-left:8px;color:#555;border-right:1px solid #eee}
+.mock-td.green{color:#0F6E56;font-weight:700}
+.mock-td.red{background:#E24B4A;color:#fff;font-weight:700;border-radius:4px}
+.mock-td.amber{background:#F59E0B;color:#fff;font-weight:700;border-radius:4px}
+.mock-sum-row .mock-td{background:#fff5f5;color:#E24B4A;font-weight:700;border-top:2px solid #E24B4A}
+.mock-sum-row .mock-td.first{color:#E24B4A;font-size:9px}
+
+/* FAB */
+.mock-fab{position:absolute;bottom:16px;right:16px;background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;border-radius:30px;padding:8px 14px;font-size:11px;font-weight:700;box-shadow:0 3px 10px rgba(29,158,117,0.4)}
+
+/* 吹き出し・注釈 */
+.callout{display:flex;align-items:flex-start;gap:10px;background:#E1F5EE;border-left:4px solid #1D9E75;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:12px;line-height:1.6;color:#0F6E56}
+.callout.red{background:#FEECEC;border-color:#E24B4A;color:#A32D2D}
+.callout.amber{background:#FFF8E6;border-color:#F59E0B;color:#92600A}
+.callout.blue{background:#EEF4FF;border-color:#3B82F6;color:#1E40AF}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+
+/* 矢印ラベル */
+.arrow-label{display:flex;align-items:center;gap:6px;font-size:12px;color:#1D9E75;font-weight:600;margin:6px 0}
+.arrow-label::before{content:'▶';font-size:10px}
+
+/* モーダルモック */
+.mock-modal{background:#fff;border-radius:16px 16px 0 0;padding:16px 14px 20px;margin:10px -10px -10px}
+.mock-modal-handle{width:30px;height:3px;background:#e0e0e0;border-radius:2px;margin:0 auto 12px}
+.mock-modal-title{font-size:13px;font-weight:700;text-align:center;margin-bottom:10px}
+.mock-modal-input{width:100%;font-size:24px;font-weight:700;text-align:center;padding:8px;border:2px solid #e8e8e8;border-radius:10px;background:#f8f9fa;margin-bottom:6px;letter-spacing:4px;font-family:inherit}
+.mock-modal-hint{font-size:11px;color:#aaa;text-align:center;margin-bottom:10px}
+.mock-item-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mock-item-btn{padding:10px 6px;border:1.5px solid #e8e8e8;border-radius:10px;background:#f8f9fa;font-size:11px;font-weight:600;text-align:center}
+
+/* ステップ */
+.steps{counter-reset:step}
+.step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.step-num{min-width:26px;height:26px;background:#f0f2f5;border:2px solid #1D9E75;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1D9E75;flex-shrink:0}
+.step-text{font-size:13px;color:#444;line-height:1.6;padding-top:3px}
+
+/* 色凡例 */
+.color-legend{display:flex;flex-direction:column;gap:8px}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-badge{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;min-width:80px;text-align:center}
+.color-badge.green{background:#E1F5EE;color:#0F6E56}
+.color-badge.red{background:#E24B4A;color:#fff}
+.color-badge.amber{background:#F59E0B;color:#fff}
+.color-badge.plain{background:#f4f6f8;color:#555}
+.color-text{font-size:13px;color:#444;line-height:1.5}
+
+/* フッター */
+.footer{text-align:center;font-size:12px;color:#aaa;margin-top:20px;padding-bottom:30px}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- タイトル -->
+  <div class="title-block">
+    <h1>ミニバー賞味期限チェック<br>利用マニュアル</h1>
+    <p>6F・7F スタッフ向け</p>
+  </div>
+
+  <!-- 0. アクセス方法 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num" style="background:#3B82F6">📱</span>アクセス方法</div>
+    <p class="desc">このアプリはウェブアプリです。携帯・PCどちらでもブラウザから利用できます。インストール不要です。</p>
+    <div class="callout blue">
+      <span class="callout-icon">🔗</span>
+      <div>下記URLをタップ（クリック）するとアプリが開きます。<br><br>
+      <a href="https://x.gd/ywiEp" style="font-size:16px;font-weight:700;color:#1D9E75;word-break:break-all">https://x.gd/ywiEp</a>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="callout-icon">💡</span>
+      ブラウザのホーム画面に追加しておくと、次回からすぐに開けます。
+    </div>
+  </div>
+
+  <!-- 1. アプリを開く -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">1</span>アプリの起動</div>
+    <p class="desc">ブラウザでURLを開くと、以下のような画面が表示されます。</p>
+
+    <div class="mockup">
+      <div class="mock-header">
+        <div class="mock-header-title">【6F】ミニバー賞味期限チェック一覧表</div>
+        <div class="mock-header-legend">
+          <div class="mock-leg"><div class="mock-dot" style="background:#0F6E56"></div>入力済み</div>
+          <div class="mock-leg"><div class="mock-dot" style="background:#E24B4A"></div>期限切れ</div>
+          <div class="mock-leg"><div class="mock-dot" style="background:#F59E0B"></div>翌月期限</div>
+        </div>
+        <div class="mock-header-btns">
+          <div class="mock-btn red">期限切れ消去</div>
+          <div class="mock-btn white">客室検索</div>
+        </div>
+      </div>
+      <div class="mock-tabs">
+        <div class="mock-tab active">6F（39室）</div>
+        <div class="mock-tab">7F（52室）</div>
+      </div>
+      <div class="mock-stats">
+        <span class="mock-stat">未入力: <b>120</b> セル</span>
+        <span class="mock-stat">期限切れ: <b style="color:#E24B4A">3</b> 件</span>
+        <span class="mock-stat">翌月期限: <b style="color:#F59E0B">5</b> 件</span>
+      </div>
+      <div class="mock-table">
+        <div class="mock-thead">
+          <div class="mock-tr">
+            <div class="mock-th first">客室番号</div>
+            <div class="mock-th">水①</div>
+            <div class="mock-th">水②</div>
+            <div class="mock-th">オロC</div>
+            <div class="mock-th">…</div>
+          </div>
+        </div>
+        <div class="mock-tr">
+          <div class="mock-td first">601</div>
+          <div class="mock-td green">26/08</div>
+          <div class="mock-td green">26/08</div>
+          <div class="mock-td red">26/04</div>
+          <div class="mock-td">…</div>
+        </div>
+        <div class="mock-tr">
+          <div class="mock-td first">602</div>
+          <div class="mock-td amber">26/07</div>
+          <div class="mock-td green">26/09</div>
+          <div class="mock-td"></div>
+          <div class="mock-td">…</div>
+        </div>
+        <div class="mock-tr">
+          <div class="mock-td first">603</div>
+          <div class="mock-td green">26/10</div>
+          <div class="mock-td green">26/10</div>
+          <div class="mock-td green">26/08</div>
+          <div class="mock-td">…</div>
+        </div>
+      </div>
+      <div class="mock-fab">客室検索</div>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">💡</span>
+      画面は全スタッフでリアルタイムに同期されます。右上に「同期済み」と表示されていれば正常です。
+    </div>
+  </div>
+
+  <!-- 2. フロア切り替え -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">2</span>フロアの切り替え</div>
+    <p class="desc">画面上部のタブで6Fと7Fを切り替えます。</p>
+
+    <div class="mockup" style="padding-bottom:14px">
+      <div class="mock-tabs">
+        <div class="mock-tab active">6F（39室）</div>
+        <div class="mock-tab">7F（52室）</div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#888;margin-top:4px">← タップしてフロアを切り替え →</div>
+    </div>
+
+    <div class="callout blue">
+      <span class="callout-icon">ℹ️</span>
+      6Fと7Fのデータは別々に管理されています。切り替えると自動的にそのフロアのデータが表示されます。
+    </div>
+  </div>
+
+  <!-- 3. 色の意味 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">3</span>色の意味</div>
+    <p class="desc">入力した賞味期限の状態によってセルの色が自動的に変わります。</p>
+
+    <div class="color-legend">
+      <div class="color-row">
+        <div class="color-badge green">26/08</div>
+        <div class="color-text"><b>入力済み（緑）</b><br>期限まで余裕あり</div>
+      </div>
+      <div class="color-row">
+        <div class="color-badge amber">26/07</div>
+        <div class="color-text"><b>翌月期限（黄）</b><br>翌月に期限が来るミニバーアイテム</div>
+      </div>
+      <div class="color-row">
+        <div class="color-badge red">26/05</div>
+        <div class="color-text"><b>期限切れ（赤）</b><br>今月入れ替えるミニバーアイテム</div>
+      </div>
+      <div class="color-row">
+        <div class="color-badge plain">（空白）</div>
+        <div class="color-text"><b>未入力</b><br>まだデータが入っていない</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. データの入力 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">4</span>賞味期限の入力方法</div>
+    <p class="desc">セルをタップして、賞味期限を入力します。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">入力したいセルをタップする</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><b>年2桁＋月2桁</b>で入力する<br>例）2026年8月 → <b>2608</b> と入力</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Enterキーを押すか、他のセルをタップすると自動的に <b>26/08</b> の形式に変換されて保存される</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">✅</span>
+      入力は即時に全スタッフの画面に反映されます。保存ボタンは不要です。
+    </div>
+
+    <div class="callout red">
+      <span class="callout-icon">⚠️</span>
+      セルを空白にして確定すると、そのデータは削除されます。
+    </div>
+  </div>
+
+  <!-- 5. 客室検索 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">5</span>客室検索の使い方</div>
+    <p class="desc">特定の客室にすばやく移動したいときは「客室検索」を使います。携帯では画面右下のボタンをタップします。</p>
+
+    <div class="mockup">
+      <div style="background:#f0f2f5;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;margin-bottom:8px">（一覧表）</div>
+      <div class="mock-fab" style="position:static;display:inline-block;margin-left:auto;display:block;width:fit-content">客室検索</div>
+      <div style="text-align:center;font-size:10px;color:#888;margin-top:4px">右下のボタン</div>
+      <div class="mock-modal">
+        <div class="mock-modal-handle"></div>
+        <div class="mock-modal-title">客室検索 — 客室番号を入力</div>
+        <div class="mock-modal-input">601</div>
+        <div class="mock-modal-hint">3桁の客室番号を入力して Enter</div>
+        <div class="mock-item-grid">
+          <div class="mock-item-btn">水ボトル①<br><span style="font-size:10px;color:#aaa">26/08</span></div>
+          <div class="mock-item-btn">水ボトル②<br><span style="font-size:10px;color:#aaa">26/08</span></div>
+          <div class="mock-item-btn">オロナミンC<br><span style="font-size:10px;color:#aaa">未入力</span></div>
+          <div class="mock-item-btn">ポカリ<br><span style="font-size:10px;color:#aaa">26/09</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">「客室検索」ボタンをタップ</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">3桁の客室番号を入力してEnter<br>例）601</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">商品一覧が表示される。入力したい商品をタップするとそのセルに移動する</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 期限切れ消去 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">6</span>期限切れの一括消去</div>
+    <p class="desc">期限切れになったデータをまとめて消去できます。</p>
+
+    <div class="mockup" style="padding-bottom:14px">
+      <div class="mock-header">
+        <div class="mock-header-btns">
+          <div class="mock-btn red">期限切れ消去</div>
+          <div class="mock-btn white">客室検索</div>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-top:6px;font-size:12px;color:#444;text-align:center">
+        「3件の期限切れデータを消去しますか？」<br>
+        <span style="color:#888;font-size:11px">↓ OKをタップで消去</span>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">ヘッダーの「期限切れ消去」ボタンをタップ</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">確認ダイアログで件数を確認しOKをタップ</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">期限切れのセルがすべて空白になる</div>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <span class="callout-icon">⚠️</span>
+      消去した内容は元に戻せません。全スタッフの画面に即時反映されます。
+    </div>
+  </div>
+
+  <!-- 7. 統計バー -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">7</span>統計バーの見方</div>
+    <p class="desc">一覧表の上にある数字で、現在のフロアの状況が確認できます。</p>
+
+    <div class="mockup" style="padding-bottom:14px">
+      <div class="mock-stats">
+        <span class="mock-stat">未入力: <b>120</b> セル</span>
+        <span class="mock-stat">期限切れ: <b style="color:#E24B4A">3</b> 件</span>
+        <span class="mock-stat">翌月期限: <b style="color:#F59E0B">5</b> 件</span>
+      </div>
+    </div>
+
+    <div class="color-legend">
+      <div class="color-row">
+        <div class="color-badge plain" style="font-size:11px">未入力</div>
+        <div class="color-text">まだデータが入っていないセルの数</div>
+      </div>
+      <div class="color-row">
+        <div class="color-badge red" style="font-size:11px">期限切れ</div>
+        <div class="color-text">今月入れ替えるミニバーアイテムの数</div>
+      </div>
+      <div class="color-row">
+        <div class="color-badge amber" style="font-size:11px">翌月期限</div>
+        <div class="color-text">翌月に期限が来るミニバーアイテムの数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 期限切れ合計行 -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">8</span>期限切れ合計行の見方</div>
+    <p class="desc">一覧表の一番下に「期限切れ合計」行があります。各アイテムごとに、期限切れの合計数を確認できます。</p>
+
+    <div class="mockup">
+      <div class="mock-table">
+        <div class="mock-thead">
+          <div class="mock-tr">
+            <div class="mock-th first">客室番号</div>
+            <div class="mock-th">水①</div>
+            <div class="mock-th">水②</div>
+            <div class="mock-th">オロC</div>
+            <div class="mock-th">ポカリ</div>
+          </div>
+        </div>
+        <div class="mock-tr">
+          <div class="mock-td first">638</div>
+          <div class="mock-td red">26/05</div>
+          <div class="mock-td green">26/09</div>
+          <div class="mock-td"></div>
+          <div class="mock-td green">26/08</div>
+        </div>
+        <div class="mock-tr">
+          <div class="mock-td first">639</div>
+          <div class="mock-td green">26/08</div>
+          <div class="mock-td red">26/04</div>
+          <div class="mock-td green">26/07</div>
+          <div class="mock-td"></div>
+        </div>
+        <div class="mock-tr mock-sum-row">
+          <div class="mock-td first">期限切れ合計</div>
+          <div class="mock-td" style="color:#E24B4A;font-weight:700">3</div>
+          <div class="mock-td" style="color:#E24B4A;font-weight:700">2</div>
+          <div class="mock-td" style="color:#E24B4A;font-weight:700">0</div>
+          <div class="mock-td" style="color:#E24B4A;font-weight:700">1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <span class="callout-icon">ℹ️</span>
+      期限切れがない列は「0」と表示されます。
+    </div>
+  </div>
+
+  <div class="footer">
+    ミニバー賞味期限チェック システム<br>
+    6F・7F 管理スタッフ向けマニュアル
+  </div>
+
+</div>
+</body>
+</html>
