@@ -249,7 +249,7 @@ function getStatus(val) {
   const nowNum = now.getFullYear() * 100 + (now.getMonth() + 1);
   const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const nextMonthNum = nextMonth.getFullYear() * 100 + (nextMonth.getMonth() + 1);
-  const in3Month = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+  const in3Month = new Date(now.getFullYear(), now.getMonth() + 2, 1);
   const in3MonthNum = in3Month.getFullYear() * 100 + (in3Month.getMonth() + 1);
   if (d <= nextMonthNum) return 'expired';
   if (d === in3MonthNum) return 'expiring';
