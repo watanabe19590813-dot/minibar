@@ -61,7 +61,7 @@ tr:hover td:first-child{background:#f8fffe}
 .item-btn:active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;transform:scale(0.97)}
 .item-btn .cur-val{font-size:11px;color:#aaa;display:block;margin-top:3px;font-weight:400}
 .fab{display:none;position:fixed;bottom:24px;right:20px;z-index:50;background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:15px;font-weight:700;font-family:inherit;box-shadow:0 4px 16px rgba(29,158,117,0.4);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.cell-info-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:10px 16px;color:#fff;font-size:14px;font-weight:700;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.2);letter-spacing:0.3px}
+.cell-info-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:10px 16px;color:#fff;font-size:14px;font-weight:700;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.2);letter-spacing:0.3px;-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform}
 .cell-info-bar .info-room{font-size:18px;font-weight:800}
 .cell-info-bar .info-item{font-size:13px;opacity:0.85;margin-top:2px}
 .cell-info-bar.visible{display:block}
@@ -284,7 +284,12 @@ function buildTable() {
         document.getElementById('cellInfoBar').classList.add('visible');
       });
       inp.addEventListener('blur', () => {
-        document.getElementById('cellInfoBar').classList.remove('visible');
+        setTimeout(() => {
+          const active = document.activeElement;
+          if (!active || !active.classList.contains('cell-input')) {
+            document.getElementById('cellInfoBar').classList.remove('visible');
+          }
+        }, 150);
       });
       inp.addEventListener('keydown', e => {
         if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
