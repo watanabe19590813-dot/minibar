@@ -61,6 +61,10 @@ tr:hover td:first-child{background:#f8fffe}
 .item-btn:active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;transform:scale(0.97)}
 .item-btn .cur-val{font-size:11px;color:#aaa;display:block;margin-top:3px;font-weight:400}
 .fab{display:none;position:fixed;bottom:24px;right:20px;z-index:50;background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:15px;font-weight:700;font-family:inherit;box-shadow:0 4px 16px rgba(29,158,117,0.4);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cell-info-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:10px 16px;color:#fff;font-size:14px;font-weight:700;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.2);letter-spacing:0.3px}
+.cell-info-bar .info-room{font-size:18px;font-weight:800}
+.cell-info-bar .info-item{font-size:13px;opacity:0.85;margin-top:2px}
+.cell-info-bar.visible{display:block}
 @media(max-width:600px){
   .app{padding:6px 6px 80px}
   .header{border-radius:12px;padding:12px 14px}
@@ -77,6 +81,11 @@ tr:hover td:first-child{background:#f8fffe}
 </style>
 </head>
 <body>
+<div class="cell-info-bar" id="cellInfoBar">
+  <div class="info-room" id="infoRoom"></div>
+  <div class="info-item" id="infoItem"></div>
+</div>
+
 <div class="app">
   <div class="header">
     <div>
@@ -89,8 +98,6 @@ tr:hover td:first-child{background:#f8fffe}
     </div>
     <div class="header-btns">
       <span class="sync-status sync-loading" id="syncStatus">接続中...</span>
-      <button class="btn" onclick="clearExpired()" style="background:rgba(226,75,74,0.15);color:#fff;border:none">期限切れ消去</button>
-      <button class="btn primary" onclick="openJump()">客室検索</button>
     </div>
   </div>
 
@@ -107,8 +114,6 @@ tr:hover td:first-child{background:#f8fffe}
     <span class="stat">翌月期限: <b id="expiringCount" style="color:#BA7517">0</b> 件</span>
     <span class="stat" id="cursorPos" style="color:#1D9E75;font-weight:500"></span>
   </div>
-
-  <button class="fab" onclick="openJump()">客室検索</button>
 
   <div class="table-wrap">
     <table>
@@ -131,17 +136,6 @@ tr:hover td:first-child{background:#f8fffe}
   </div>
 </div>
 
-<div class="modal-bg" id="jumpModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <h2 id="jumpTitle">客室検索 — 客室番号を入力</h2>
-    <input class="modal-input" id="jumpInput" type="number" placeholder="601">
-    <div class="modal-hint" id="jumpHint">3桁の客室番号を入力して Enter</div>
-    <div class="modal-btns" id="jumpBtns">
-      <button class="btn" onclick="closeJump()" style="flex:1">キャンセル</button>
-    </div>
-  </div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -165,7 +159,6 @@ const ROOMS_7F = [701,702,703,704,705,706,707,708,709,710,711,712,714,715,716,71
 
 let currentFloor = '6F';
 let data = { '6F': {}, '7F': {} };
-let jumpPhase = 'room';
 let listeners = {};
 
 ROOMS_6F.forEach(r => { data['6F'][r] = Array(9).fill(''); });
@@ -286,6 +279,12 @@ function buildTable() {
       applyClass(inp, val || '');
       inp.addEventListener('focus', () => {
         document.getElementById('cursorPos').textContent = room + ' — ' + COLS[ci];
+        document.getElementById('infoRoom').textContent = '客室 ' + room;
+        document.getElementById('infoItem').textContent = COLS[ci];
+        document.getElementById('cellInfoBar').classList.add('visible');
+      });
+      inp.addEventListener('blur', () => {
+        document.getElementById('cellInfoBar').classList.remove('visible');
       });
       inp.addEventListener('keydown', e => {
         if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
@@ -372,83 +371,6 @@ function updateStats() {
   document.getElementById('expiringCount').textContent = expiring;
 }
 
-function clearExpired() {
-  const ROOMS = getCurrentRooms();
-  const floorData = data[currentFloor];
-  const targets = [];
-  ROOMS.forEach(r => {
-    (floorData[r] || []).forEach((v, ci) => {
-      if (getStatus(v) === 'expired') targets.push({r, ci});
-    });
-  });
-  if (targets.length === 0) { alert('期限切れのセルはありません。'); return; }
-  if (!confirm(targets.length + '件の期限切れデータを消去しますか？')) return;
-  setSyncStatus('loading');
-  const updates = {};
-  targets.forEach(({r, ci}) => {
-    floorData[r][ci] = '';
-    const cPath = currentFloor === '6F' ? 'rooms' : currentFloor + '/rooms';
-    updates[cPath + '/' + r + '/cells/' + ci] = null;
-  });
-  db.ref().update(updates)
-    .then(() => { buildTable(); setSyncStatus('ok'); })
-    .catch(e => setSyncStatus('err', e.message));
-}
-
-function openJump() {
-  const ROOMS = getCurrentRooms();
-  jumpPhase = 'room';
-  document.getElementById('jumpTitle').textContent = '客室検索 — 客室番号を入力';
-  document.getElementById('jumpInput').style.display = '';
-  document.getElementById('jumpHint').textContent = '3桁の客室番号を入力して Enter';
-  document.getElementById('jumpHint').style.color = '#888';
-  document.getElementById('jumpInput').value = '';
-  document.getElementById('jumpBtns').innerHTML = '<button class="btn" onclick="closeJump()" style="flex:1;color:#555;background:#f0f0f0">キャンセル</button>';
-  document.getElementById('jumpModal').classList.add('open');
-  setTimeout(() => document.getElementById('jumpInput').focus(), 80);
-}
-
-document.getElementById('jumpInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && jumpPhase === 'room') {
-    const ROOMS = getCurrentRooms();
-    const floorData = data[currentFloor];
-    const v = parseInt(document.getElementById('jumpInput').value);
-    if (ROOMS.includes(v)) {
-      jumpPhase = 'item';
-      document.getElementById('jumpTitle').textContent = v + ' — 項目を選択';
-      document.getElementById('jumpInput').style.display = 'none';
-      document.getElementById('jumpHint').textContent = 'ボタンをクリックして項目を選択';
-      const btns = document.getElementById('jumpBtns');
-      btns.innerHTML = '';
-      COLS.forEach((col, ci) => {
-        const b = document.createElement('button');
-        b.className = 'item-btn';
-        const curVal = (floorData[v] || [])[ci] || '';
-        b.innerHTML = col + (curVal ? '<span class="cur-val">' + curVal + '</span>' : '');
-        b.onclick = () => { closeJump(); setTimeout(() => focusCell(ROOMS.indexOf(v), ci), 100); };
-        btns.appendChild(b);
-      });
-      const cancel = document.createElement('button');
-      cancel.className = 'btn';
-      cancel.textContent = 'キャンセル';
-      cancel.style.cssText = 'flex:1 1 100%;margin-top:4px;color:#555;background:#f0f0f0';
-      cancel.onclick = closeJump;
-      btns.appendChild(cancel);
-    } else {
-      document.getElementById('jumpHint').textContent = '部屋番号が見つかりません。再度入力してください。';
-      document.getElementById('jumpHint').style.color = '#E24B4A';
-      document.getElementById('jumpInput').value = '';
-    }
-  }
-});
-
-function closeJump() {
-  document.getElementById('jumpModal').classList.remove('open');
-}
-
-document.getElementById('jumpModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('jumpModal')) closeJump();
-});
 </script>
 </body>
 </html>
