@@ -61,9 +61,10 @@ tr:hover td:first-child{background:#f8fffe}
 .item-btn:active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;transform:scale(0.97)}
 .item-btn .cur-val{font-size:11px;color:#aaa;display:block;margin-top:3px;font-weight:400}
 .fab{display:none;position:fixed;bottom:24px;right:20px;z-index:50;background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:15px;font-weight:700;font-family:inherit;box-shadow:0 4px 16px rgba(29,158,117,0.4);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.cell-info-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:10px 16px;color:#fff;font-size:14px;font-weight:700;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.2);letter-spacing:0.3px;-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform}
-.cell-info-bar .info-room{font-size:18px;font-weight:800}
-.cell-info-bar .info-item{font-size:13px;opacity:0.85;margin-top:2px}
+.cell-info-bar{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:10px 20px;color:#fff;border-radius:50px;box-shadow:0 4px 16px rgba(29,158,117,0.45);text-align:center;white-space:nowrap;-webkit-transform:translateX(-50%);will-change:transform}
+.cell-info-bar .info-room{font-size:16px;font-weight:800;display:inline}
+.cell-info-bar .info-sep{margin:0 6px;opacity:0.6}
+.cell-info-bar .info-item{font-size:14px;font-weight:600;display:inline}
 .cell-info-bar.visible{display:block}
 @media(max-width:600px){
   .app{padding:6px 6px 80px}
@@ -82,8 +83,9 @@ tr:hover td:first-child{background:#f8fffe}
 </head>
 <body>
 <div class="cell-info-bar" id="cellInfoBar">
-  <div class="info-room" id="infoRoom"></div>
-  <div class="info-item" id="infoItem"></div>
+  <span class="info-room" id="infoRoom"></span>
+  <span class="info-sep">—</span>
+  <span class="info-item" id="infoItem"></span>
 </div>
 
 <div class="app">
@@ -282,6 +284,7 @@ function buildTable() {
         document.getElementById('infoRoom').textContent = '客室 ' + room;
         document.getElementById('infoItem').textContent = COLS[ci];
         document.getElementById('cellInfoBar').classList.add('visible');
+        updateInfoBarPos();
       });
       inp.addEventListener('blur', () => {
         setTimeout(() => {
@@ -374,6 +377,18 @@ function updateStats() {
   document.getElementById('filledCount').textContent = totalCells - filled;
   document.getElementById('expiredCount').textContent = expired;
   document.getElementById('expiringCount').textContent = expiring;
+}
+
+function updateInfoBarPos() {
+  const bar = document.getElementById('cellInfoBar');
+  if (window.visualViewport) {
+    const keyboardHeight = window.innerHeight - window.visualViewport.height;
+    bar.style.bottom = (keyboardHeight + 16) + 'px';
+  }
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateInfoBarPos);
+  window.visualViewport.addEventListener('scroll', updateInfoBarPos);
 }
 
 </script>
